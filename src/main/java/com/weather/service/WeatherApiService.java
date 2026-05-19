@@ -1,0 +1,55 @@
+package com.weather.service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.weather.model.WeatherData;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import com.weather.model.ForecastDay;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class WeatherApiService {
+    private final String API_KEY = "9f97d9f90767badf31e09b179aeabe69";
+    public List<ForecastDay> getForecast(String city) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = String.format("http://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&units=metric&lang=ru", city, API_KEY);
+        JsonNode root = restTemplate.getForObject(url, JsonNode.class);
+        List<ForecastDay> forecast = new ArrayList<>();
+
+        if (root != null && root.has("list")) {
+            for (JsonNode node : root.path("list")) {
+                String dtTxt = node.path("dt_txt").asText();
+
+                if (dtTxt.contains("12:00:00")) {
+                    forecast.add(new ForecastDay(
+                            dtTxt.substring(0, 10),
+                            node.path("main").path("temp").asDouble(),
+                            node.path("weather").get(0).path("description").asText(),
+                            node.path("weather").get(0).path("icon").asText()
+                    ));
+                }
+            }
+        }
+        return forecast;
+    }
+    public WeatherData getRemoteWeather(String city) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = String.format("http://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=ru", city, API_KEY);
+
+        JsonNode root = restTemplate.getForObject(url, JsonNode.class);
+
+        return new WeatherData(
+                root.path("name").asText(),
+                root.path("sys").path("country").asText(), // <-- Достаем страну
+                root.path("main").path("temp").asDouble(),
+                root.path("weather").get(0).path("description").asText(),
+                root.path("main").path("humidity").asInt(),
+                root.path("wind").path("speed").asDouble(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
+                root.path("weather").get(0).path("icon").asText()
+        );    }
+
+}

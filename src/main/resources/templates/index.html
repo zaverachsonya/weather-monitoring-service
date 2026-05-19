@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Погодный Монитор</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap');
+
+    .main-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(45deg, #0d6efd, #00b4db);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .title-container {
+      margin-bottom: 50px;
+      text-align: center;
+    }
+
+    .title-icon {
+      font-size: 2.5rem;
+      color: #0d6efd;
+      vertical-align: middle;
+      margin-right: 10px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+    .weather-card { transition: transform 0.2s; border-radius: 15px; }
+    .weather-card:hover { transform: translateY(-5px); }
+    .temp-main { font-size: 2rem; font-weight: bold; }
+
+    @keyframes highlight-fade {
+  0% { background-color: #fff3cd; } /* Светло-желтый (Bootstrap warning) */
+  100% { background-color: transparent; }
+}
+.highlight-new {
+  animation: highlight-fade 3s ease-in-out;
+  border: 2px solid #ffda6a !important; /* Небольшая рамка для акцента */
+}
+
+    .sort-container {
+      background: #f8f9fa;
+      padding: 10px 20px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body class="bg-light text-dark">
+
+<div class="container py-5">
+  <h1 class="main-title">
+    <i class="bi bi-broadcast-pin title-icon"></i>
+    Сервис для мониторинга погоды
+  </h1>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#settingsModal">
+      <i class="bi bi-gear-fill"></i> Настроить карточки
+    </button>
+  </div>
+  <!-- блок карточек -->
+  <div class="row row-cols-1 row-cols-md-5 g-4 mb-5">
+    <div class="col" th:each="p : ${popular}">
+      <div class="card h-100 shadow-sm weather-card text-center border-0">
+        <div class="card-body">
+          <h5 class="card-title">
+            <a th:href="@{'/forecast/' + ${p.city}}"
+               class="text-decoration-none text-primary"
+               th:text="${p.city}"
+               title="Нажмите, чтобы увидеть прогноз на 5 дней">Город</a>
+          </h5>
+          <h6 class="card-subtitle mb-2 text-muted" th:text="${p.country}">Страна</h6>
+          <img th:src="@{'http://openweathermap.org/img/wn/' + ${p.icon} + '@2x.png'}" alt="weather-icon">
+          <div class="temp-main" th:text="${#numbers.formatDecimal(p.temperature, 1, 1) + '°C'}">0°C</div>
+          <p class="card-text text-muted text-capitalize" th:text="${p.condition}">ясно</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- поиск -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-md-8">
+      <form th:action="@{/fetch}" method="post" class="input-group input-group-lg shadow-sm">
+        <input type="text" name="city" id="city-input" list="city-list"
+               class="form-control border-0 px-4"
+               placeholder="Введите город..."
+               autocomplete="off"
+               required style="border-radius: 15px 0 0 15px;">
+
+
+        <datalist id="city-list"></datalist>
+
+        <button type="submit" class="btn btn-primary px-5" style="border-radius: 0 15px 15px 0;">Найти</button>
+      </form>
+    </div>
+  </div>
+
+
+  <div class="sort-container mb-3 shadow-sm">
+    <h4 class="m-0 text-secondary">Ваш список запросов</h4>
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-muted small fw-bold">СОРТИРОВАТЬ:</span>
+      <div class="btn-group">
+        <button type="button" onclick="sortTable(3, false)" class="btn btn-sm btn-outline-primary">По городу</button>
+        <button type="button" onclick="sortTable(2, false)" class="btn btn-sm btn-outline-primary">По стране</button>
+        <button type="button" onclick="sortTable(4, true, false)" class="btn btn-sm btn-outline-primary">Темп. ↑</button>
+        <button type="button" onclick="sortTable(4, true, true)" class="btn btn-sm btn-outline-primary">Темп. ↓</button>
+        <button type="button" onclick="sortTable(5, false)" class="btn btn-sm btn-outline-primary">По состоянию</button>
+      </div>
+      <a href="/" class="btn btn-sm btn-secondary">Сброс</a>
+    </div>
+  </div>
+
+  <!-- таблица с городами -->
+  <div class="table-responsive shadow-sm bg-white" style="border-radius: 15px; overflow: hidden;">
+    <table class="table table-hover align-middle mb-0" id="weatherTable">
+      <thead class="table-dark">
+      <tr>
+        <th style="width: 50px;"></th>
+        <th>Детали</th>
+        <th>Страна</th>
+        <th>Город</th>
+        <th>Температура</th>
+        <th>Условия</th>
+        <th>Влажность</th>
+        <th>Ветер</th>
+        <th>Дата</th>
+
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="w : ${history}"
+          th:id="'city-' + ${#strings.replace(w.city, ' ', '_')}"
+          th:data-favorite="${w.favorite}"
+          th:classappend="${w.city == highlightedCity ? 'highlight-new' : ''}">
+
+        <td class="text-center">
+          <form th:action="@{/favorite}" method="post">
+            <input type="hidden" name="city" th:value="${w.city}">
+            <button type="submit" class="btn btn-link p-0 m-0 shadow-none">
+              <i class="bi" th:classappend="${w.favorite ? 'bi-star-fill text-warning' : 'bi-star text-secondary'}"></i>
+            </button>
+          </form>
+        </td>
+        <td>
+          <a th:href="@{'/forecast/' + ${w.city}}" class="btn btn-sm btn-outline-info">
+            <i class="bi bi-calendar3"></i> 5 дней
+          </a>
+        </td>
+        <td th:text="${w.country}"></td>
+        <td><strong th:text="${w.city}"></strong></td>
+        <td th:data-order="${w.temperature}">
+          <img th:if="${w.icon != null}" th:src="@{'http://openweathermap.org/img/wn/' + ${w.icon} + '.png'}" width="30">
+          <span th:text="${#numbers.formatDecimal(w.temperature, 1, 1) + '°C'}"></span>
+        </td>
+        <td class="text-capitalize" th:text="${w.condition}"></td>
+        <td th:text="${w.humidity + '%'}"></td>
+        <td th:text="${w.windSpeed + ' м/с'}"></td>
+        <td class="small text-muted" th:text="${w.date}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function sortTable(colIdx, isNumeric, reverse = false) {
+    const table = document.getElementById("weatherTable");
+    const tbody = table.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+
+    rows.sort((a, b) => {
+
+        const favA = a.getAttribute('data-favorite') === 'true' ? 1 : 0;
+        const favB = b.getAttribute('data-favorite') === 'true' ? 1 : 0;
+
+        if (favA !== favB) {
+            return favB - favA; // Избранные (1) всегда выше обычных (0)
+        }
+
+        let valA = a.cells[colIdx].innerText.trim();
+        let valB = b.cells[colIdx].innerText.trim();
+
+        if (isNumeric) {
+            valA = parseFloat(a.cells[colIdx].getAttribute('data-order') || valA);
+            valB = parseFloat(b.cells[colIdx].getAttribute('data-order') || valB);
+        }
+
+        if (valA < valB) return reverse ? 1 : -1;
+        if (valA > valB) return reverse ? -1 : 1;
+        return 0;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+</script>
+<script>
+  const cityInput = document.getElementById('city-input');
+  const cityList = document.getElementById('city-list');
+  const API_KEY = '9f97d9f90767badf31e09b179aeabe69';
+
+  cityInput.addEventListener('input', async () => {
+    const query = cityInput.value.trim();
+
+    if (query.length < 2) {
+      cityList.innerHTML = '';
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=10&appid=${API_KEY}`);
+      const cities = await response.json();
+
+      cityList.innerHTML = '';
+
+      cities.forEach(city => {
+        let russianName = city.local_names && city.local_names.ru ? city.local_names.ru : null;
+
+        if (russianName) {
+            const option = document.createElement('option');
+            option.value = russianName; // Теперь значение будет "Будапешт"
+            option.innerText = `${russianName} (${city.country})`;
+            cityList.appendChild(option);
+        }
+      });
+
+      console.log("Отображено в списке для " + query + ":", Array.from(cityList.options).map(o => o.value));
+    } catch (e) {
+      console.log("Ошибка сети");
+    }
+  });
+</script>
+<script th:inline="javascript">
+  window.addEventListener('load', function() {
+      const newCity = [[${highlightedCity}]];
+      if (newCity) {
+          const safeId = 'city-' + newCity.replace(/ /g, '_');
+          const element = document.getElementById(safeId);
+          if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+      }
+  });
+</script>
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Настройка популярных городов</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form th:action="@{/update-popular}" method="post">
+        <div class="modal-body">
+          <p class="small text-muted">Введите названия 5 городов для отображения в верхней панели:</p>
+          <div th:each="name, stat : ${currentPopularNames}" class="mb-2">
+            <input type="text" name="cities" class="form-control"
+                   th:value="${name}" th:placeholder="'Город ' + ${stat.count}">
+          </div>
+          <div th:if="${currentPopularNames.size() < 5}"
+               th:each="i : ${#numbers.sequence(currentPopularNames.size() + 1, 5)}" class="mb-2">
+            <input type="text" name="cities" class="form-control" th:placeholder="'Город ' + ${i}">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

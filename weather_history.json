@@ -1,0 +1,71 @@
+[ {
+  "city" : "Амстердам",
+  "temperature" : 9.01,
+  "condition" : "переменная облачность",
+  "humidity" : 85,
+  "windSpeed" : 1.34,
+  "date" : "19.05.2026 00:42",
+  "icon" : "03n",
+  "favorite" : false,
+  "country" : "NL"
+}, {
+  "city" : "Могилёв",
+  "temperature" : 14.07,
+  "condition" : "пасмурно",
+  "humidity" : 92,
+  "windSpeed" : 0.98,
+  "date" : "19.05.2026 02:42",
+  "icon" : "04n",
+  "favorite" : false,
+  "country" : "BY"
+}, {
+  "city" : "Кипр",
+  "temperature" : 13.29,
+  "condition" : "пасмурно",
+  "humidity" : 57,
+  "windSpeed" : 0.91,
+  "date" : "19.05.2026 02:43",
+  "icon" : "04n",
+  "favorite" : false,
+  "country" : "CY"
+}, {
+  "city" : "Ереван",
+  "temperature" : 5.09,
+  "condition" : "переменная облачность",
+  "humidity" : 100,
+  "windSpeed" : 0.51,
+  "date" : "19.05.2026 02:48",
+  "icon" : "03n",
+  "favorite" : true,
+  "country" : "AM"
+}, {
+  "city" : "Брест",
+  "temperature" : 10.75,
+  "condition" : "небольшая облачность",
+  "humidity" : 93,
+  "windSpeed" : 2.99,
+  "date" : "19.05.2026 02:48",
+  "icon" : "02n",
+  "favorite" : true,
+  "country" : "BY"
+}, {
+  "city" : "Париж",
+  "temperature" : 16.54,
+  "condition" : "пасмурно",
+  "humidity" : 83,
+  "windSpeed" : 6.17,
+  "date" : "19.05.2026 20:59",
+  "icon" : "04d",
+  "favorite" : false,
+  "country" : "FR"
+}, {
+  "city" : "Витебск",
+  "temperature" : 14.19,
+  "condition" : "облачно с прояснениями",
+  "humidity" : 97,
+  "windSpeed" : 2.16,
+  "date" : "20.05.2026 02:38",
+  "icon" : "04n",
+  "favorite" : true,
+  "country" : "BY"
+} ]
