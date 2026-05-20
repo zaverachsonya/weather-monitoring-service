@@ -14,13 +14,11 @@ import org.springframework.beans.factory.annotation.Value;
 @Service
 public class WeatherApiService {
 
-    // 1. Создаем переменную, в которую Spring положит ключ из application.properties
     @Value("${weather.api.key}")
     private String apiKey;
 
     public List<ForecastDay> getForecast(String city) {
         RestTemplate restTemplate = new RestTemplate();
-        // 2. Используем apiKey здесь (вместо старого API_KEY)
         String url = String.format("http://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&units=metric&lang=ru", city, apiKey);
 
         JsonNode root = restTemplate.getForObject(url, JsonNode.class);
@@ -45,7 +43,6 @@ public class WeatherApiService {
 
     public WeatherData getRemoteWeather(String city) {
         RestTemplate restTemplate = new RestTemplate();
-        // 3. И здесь тоже используем apiKey
         String url = String.format("http://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=ru", city, apiKey);
 
         JsonNode root = restTemplate.getForObject(url, JsonNode.class);
