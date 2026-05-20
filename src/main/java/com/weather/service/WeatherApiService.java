@@ -9,13 +9,20 @@ import java.time.format.DateTimeFormatter;
 import com.weather.model.ForecastDay;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class WeatherApiService {
-    private final String API_KEY = "9f97d9f90767badf31e09b179aeabe69";
+
+    // 1. Создаем переменную, в которую Spring положит ключ из application.properties
+    @Value("${weather.api.key}")
+    private String apiKey;
+
     public List<ForecastDay> getForecast(String city) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = String.format("http://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&units=metric&lang=ru", city, API_KEY);
+        // 2. Используем apiKey здесь (вместо старого API_KEY)
+        String url = String.format("http://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&units=metric&lang=ru", city, apiKey);
+
         JsonNode root = restTemplate.getForObject(url, JsonNode.class);
         List<ForecastDay> forecast = new ArrayList<>();
 
@@ -35,21 +42,23 @@ public class WeatherApiService {
         }
         return forecast;
     }
+
     public WeatherData getRemoteWeather(String city) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = String.format("http://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=ru", city, API_KEY);
+        // 3. И здесь тоже используем apiKey
+        String url = String.format("http://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=ru", city, apiKey);
 
         JsonNode root = restTemplate.getForObject(url, JsonNode.class);
 
         return new WeatherData(
                 root.path("name").asText(),
-                root.path("sys").path("country").asText(), // <-- Достаем страну
+                root.path("sys").path("country").asText(),
                 root.path("main").path("temp").asDouble(),
                 root.path("weather").get(0).path("description").asText(),
                 root.path("main").path("humidity").asInt(),
                 root.path("wind").path("speed").asDouble(),
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")),
                 root.path("weather").get(0).path("icon").asText()
-        );    }
-
+        );
+    }
 }
