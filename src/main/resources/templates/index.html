@@ -8,13 +8,17 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap');
 
+    /* Глубокий синий везде вместо голубого */
+    :root {
+      --main-blue: #004aad;
+      --soft-pink: #fff5f8; /* Очень нежный розовый */
+    }
+
     .main-title {
       font-family: 'Montserrat', sans-serif;
       font-weight: 800;
       letter-spacing: -1px;
-      background: linear-gradient(45deg, #0d6efd, #00b4db);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--main-blue); /* Убрали градиент, сделали сплошной синий */
       margin-bottom: 10px;
     }
 
@@ -25,23 +29,39 @@
 
     .title-icon {
       font-size: 2.5rem;
-      color: #0d6efd;
+      color: var(--main-blue);
       vertical-align: middle;
       margin-right: 10px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
-    .weather-card { transition: transform 0.2s; border-radius: 15px; }
-    .weather-card:hover { transform: translateY(-5px); }
-    .temp-main { font-size: 2rem; font-weight: bold; }
 
-    @keyframes highlight-fade {
-  0% { background-color: #fff3cd; } /* Светло-желтый (Bootstrap warning) */
-  100% { background-color: transparent; }
-}
-.highlight-new {
-  animation: highlight-fade 3s ease-in-out;
-  border: 2px solid #ffda6a !important; /* Небольшая рамка для акцента */
-}
+    /* Карточки нежно-розовые */
+    .weather-card {
+      transition: transform 0.2s;
+      border-radius: 15px;
+      background-color: var(--soft-pink) !important;
+    }
+    .weather-card:hover { transform: translateY(-5px); }
+
+    /* Чтобы облака было видно: белая мягкая подложка под иконкой */
+    .weather-card img {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      margin: 10px 0;
+    }
+
+    .temp-main { font-size: 2rem; font-weight: bold; color: var(--main-blue); }
+
+    /* Перекрашиваем кнопки и ссылки в наш синий */
+    .text-primary, .btn-outline-primary, .btn-primary {
+      color: var(--main-blue) !important;
+      border-color: var(--main-blue) !important;
+    }
+    .btn-primary {
+      background-color: var(--main-blue) !important;
+      color: white !important;
+    }
+
+    .table-dark { background-color: var(--main-blue) !important; }
 
     .sort-container {
       background: #f8f9fa;
