@@ -8,71 +8,57 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=swap');
 
-    /* Глубокий синий везде вместо голубого */
     :root {
       --main-blue: #004aad;
-      --soft-pink: #fff5f8; /* Очень нежный розовый */
+      --light-grey: #f2f4f7;
+      --highlight-color: #fff3cd;
     }
 
     .main-title {
       font-family: 'Montserrat', sans-serif;
       font-weight: 800;
       letter-spacing: -1px;
-      color: var(--main-blue); /* Убрали градиент, сделали сплошной синий */
+      color: var(--main-blue);
+      text-align: center;
       margin-bottom: 10px;
     }
 
-    .title-container {
-      margin-bottom: 50px;
-      text-align: center;
-    }
-
-    .title-icon {
-      font-size: 2.5rem;
-      color: var(--main-blue);
-      vertical-align: middle;
-      margin-right: 10px;
-    }
-
-    /* Карточки нежно-розовые */
     .weather-card {
       transition: transform 0.2s;
       border-radius: 15px;
-      background-color: var(--soft-pink) !important;
+      background-color: var(--light-grey) !important;
+      border: 1px solid #e1e4e8 !important;
     }
-    .weather-card:hover { transform: translateY(-5px); }
+    .weather-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
 
-    /* Чтобы облака было видно: белая мягкая подложка под иконкой */
-    .weather-card img {
-      background: rgba(255, 255, 255, 0.5);
+    #weatherTable tbody tr {
+      background-color: var(--light-grey);
+    }
+    #weatherTable tbody tr:hover {
+      background-color: #e9ecef;
+    }
+
+    @keyframes highlight-fade {
+      0% { background-color: #ffe69c !important; transform: scale(1.02); }
+      100% { background-color: var(--light-grey) !important; transform: scale(1); }
+    }
+    .highlight-new {
+      animation: highlight-fade 3s ease-in-out;
+      border: 2px solid #ffda6a !important;
+      position: relative;
+      z-index: 10;
+    }
+
+    .weather-card img, .table img {
+      background: rgba(255, 255, 255, 0.8);
       border-radius: 50%;
-      margin: 10px 0;
+      padding: 2px;
     }
 
     .temp-main { font-size: 2rem; font-weight: bold; color: var(--main-blue); }
-
-    /* Перекрашиваем кнопки и ссылки в наш синий */
-    .text-primary, .btn-outline-primary, .btn-primary {
-      color: var(--main-blue) !important;
-      border-color: var(--main-blue) !important;
-    }
-    .btn-primary {
-      background-color: var(--main-blue) !important;
-      color: white !important;
-    }
-
-    .table-dark { background-color: var(--main-blue) !important; }
-
-    .sort-container {
-      background: #f8f9fa;
-      padding: 10px 20px;
-      border-radius: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+    .text-primary { color: var(--main-blue) !important; }
+    .btn-primary { background-color: var(--main-blue) !important; border-color: var(--main-blue) !important; }
+    .table-dark { background-color: var(--main-blue) !important; border-color: var(--main-blue) !important; }
   </style>
 </head>
 <body class="bg-light text-dark">
@@ -162,7 +148,7 @@
       <tr th:each="w : ${history}"
           th:id="'city-' + ${#strings.replace(w.city, ' ', '_')}"
           th:data-favorite="${w.favorite}"
-          th:classappend="${w.city == highlightedCity ? 'highlight-new' : ''}">
+          th:classappend="${#strings.toLowerCase(w.city) == #strings.toLowerCase(highlightedCity) ? 'highlight-new' : ''}">
 
         <td class="text-center">
           <form th:action="@{/favorite}" method="post">

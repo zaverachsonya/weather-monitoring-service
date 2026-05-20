@@ -8,24 +8,18 @@
     <style>
         :root {
           --main-blue: #004aad;
-          --soft-pink: #fff5f8;
-        }
-
-        .city-name-highlight {
-            color: var(--main-blue);
-            font-weight: 800;
+          --light-grey: #f2f4f7;
         }
 
         .forecast-card {
-            background-color: var(--soft-pink) !important;
+            background-color: var(--light-grey) !important;
             border-radius: 20px;
             transition: transform 0.3s ease;
-            border: none;
+            border: 1px solid #e1e4e8;
         }
 
-        /* Подложка под иконку для контраста */
         .forecast-card img {
-          background: rgba(255, 255, 255, 0.5);
+          background: rgba(255, 255, 255, 0.8);
           border-radius: 50%;
         }
 
@@ -35,24 +29,10 @@
             padding: 5px 15px;
             border-radius: 50px;
             font-weight: bold;
-            border: 1px solid #eee;
+            border: 1px solid #e1e4e8;
         }
 
-        .temp-val {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--main-blue);
-            margin: 10px 0;
-        }
-
-        .back-btn {
-            border-color: var(--main-blue) !important;
-            color: var(--main-blue) !important;
-        }
-        .back-btn:hover {
-            background-color: var(--main-blue) !important;
-            color: white !important;
-        }
+        .temp-val { color: var(--main-blue); font-weight: 800; }
     </style>
 </head>
 <body class="bg-light">
