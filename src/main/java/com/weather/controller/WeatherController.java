@@ -1,47 +1,48 @@
 package com.weather.controller;
 
-import com.weather.model.WeatherData;
-import com.weather.repository.WeatherRepository;
+import com.weather.model.*;
+import com.weather.repository.UserRepository;
 import com.weather.service.WeatherApiService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import com.weather.model.ForecastDay;
+import java.security.Principal;
+import java.util.*;
 
 @Controller
 public class WeatherController {
     private final WeatherApiService apiService;
-    private final WeatherRepository repository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     private final List<String> tableCities = List.of(
             "Минск", "Брест", "Гродно", "Витебск", "Могилев",
             "Москва", "Санкт-Петербург", "Киев", "Варшава", "Прага",
-            "Берлин", "Мадрид", "Астана",
-            "Пекин", "Дубай", "Стамбул", "Сеул", "Ереван"
+            "Берлин", "Мадрид", "Астана", "Пекин", "Дубай", "Стамбул", "Сеул", "Ереван"
     );
 
-    public WeatherController(WeatherApiService apiService, WeatherRepository repository) {
+
+    public WeatherController(WeatherApiService apiService,
+                             UserRepository userRepository,
+                             PasswordEncoder passwordEncoder) {
         this.apiService = apiService;
-        this.repository = repository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-
-
     @GetMapping("/")
-    public String index(Model model,
+    public String index(Model model, Principal principal,
                         @RequestParam(required = false) String sort,
                         @RequestParam(required = false) String newCity) {
 
-        List<WeatherData> userHistory = repository.getAll();
-        if (userHistory == null) userHistory = new ArrayList<>();
 
-        List<String> cardCities = repository.getPopularCities();
+        User user = userRepository.findByUsername(principal.getName()).orElseThrow();
+        List<WeatherData> userHistory = user.getHistory();
+        List<String> cardCities = user.getPopularCities();
 
         List<WeatherData> popularCards = new ArrayList<>();
         for (String city : cardCities) {
@@ -54,18 +55,13 @@ public class WeatherController {
                             .ifPresent(h -> data.setFavorite(h.isFavorite()));
                     popularCards.add(data);
                 }
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
         }
 
-
         List<WeatherData> mainTable = new ArrayList<>();
-
-        java.util.Set<String> allCitiesToDisplay = new java.util.LinkedHashSet<>();
-
-
+        Set<String> allCitiesToDisplay = new LinkedHashSet<>();
         userHistory.forEach(h -> allCitiesToDisplay.add(h.getCity()));
         allCitiesToDisplay.addAll(tableCities);
-
 
         for (String cityName : allCitiesToDisplay) {
             try {
@@ -75,7 +71,6 @@ public class WeatherController {
                             .filter(h -> h.getCity().equalsIgnoreCase(freshData.getCity()))
                             .findFirst()
                             .ifPresent(h -> freshData.setFavorite(h.isFavorite()));
-
                     mainTable.add(freshData);
                 }
             } catch (Exception e) {
@@ -102,72 +97,95 @@ public class WeatherController {
         model.addAttribute("popular", popularCards);
         model.addAttribute("history", mainTable);
         model.addAttribute("highlightedCity", newCity != null ? newCity : "");
-        model.addAttribute("currentPopularNames", cardCities); // Добавим, чтобы заполнить поля в модалке
-
+        model.addAttribute("currentPopularNames", cardCities);
 
         return "index";
     }
-    @GetMapping("/forecast/{city}")
-    public String forecast(@PathVariable String city, Model model) {
-        try {
-            List<ForecastDay> days = apiService.getForecast(city);
-            model.addAttribute("city", city);
-            model.addAttribute("days", days);
-        } catch (Exception e) {
-            return "redirect:/";
-        }
-        return "forecast";
-    }
+
     @PostMapping("/update-popular")
-    public String updatePopular(@RequestParam("cities") List<String> cities) {
+    public String updatePopular(@RequestParam("cities") List<String> cities, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).get();
         List<String> filtered = cities.stream()
                 .filter(c -> c != null && !c.isBlank())
                 .limit(5)
                 .toList();
-        repository.savePopularCities(filtered);
+        user.setPopularCities(filtered);
+        userRepository.save(user);
         return "redirect:/";
     }
 
     @PostMapping("/fetch")
-    public String fetch(@RequestParam String city) {
+    public String fetch(@RequestParam String city, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).get();
         String encodedCity = "";
         try {
             WeatherData data = apiService.getRemoteWeather(city);
             if (data != null) {
-                repository.save(data);
+                user.getHistory().removeIf(d -> d.getCity().equalsIgnoreCase(data.getCity()));
+                user.getHistory().add(data);
+                userRepository.save(user);
                 encodedCity = UriUtils.encode(data.getCity(), StandardCharsets.UTF_8);
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception ignored) {}
         return "redirect:/?newCity=" + encodedCity;
     }
 
     @PostMapping("/favorite")
-    public String toggleFavorite(@RequestParam String city) {
-        List<WeatherData> history = repository.getAll();
+    public String toggleFavorite(@RequestParam String city, Principal principal) {
+        User user = userRepository.findByUsername(principal.getName()).get();
         boolean found = false;
-
-        for (WeatherData d : history) {
+        for (WeatherData d : user.getHistory()) {
             if (d.getCity().equalsIgnoreCase(city)) {
                 d.setFavorite(!d.isFavorite());
                 found = true;
                 break;
             }
         }
-
         if (!found) {
             try {
                 WeatherData data = apiService.getRemoteWeather(city);
                 if (data != null) {
                     data.setFavorite(true);
-                    history.add(data);
+                    user.getHistory().add(data);
                 }
-            } catch (Exception e) {
-                System.err.println("Ошибка при добавлении в избранное");
-            }
+            } catch (Exception ignored) {}
+        }
+        userRepository.save(user);
+        return "redirect:/";
+    }
+
+    @GetMapping("/login")
+    public String login() { return "login"; }
+
+    @GetMapping("/register")
+    public String registerPage() { return "register"; }
+    @PostMapping("/register")
+    public String registerUser(@RequestParam String username, @RequestParam String password) {
+
+        System.out.println("=== ПОПЫТКА РЕГИСТРАЦИИ ===");
+        System.out.println("Username: " + username);
+        System.out.println("Password: " + password);
+
+        if (userRepository.findByUsername(username).isPresent()) {
+            System.out.println("ОШИБКА: Юзер уже есть!");
+            return "redirect:/register?error";
         }
 
-        repository.saveAll(history);
-        return "redirect:/";
+        User newUser = new User(username, passwordEncoder.encode(password));
+        userRepository.save(newUser);
+
+        System.out.println("УСПЕХ: Юзер сохранен!");
+        return "redirect:/login";
+    }
+
+
+    @GetMapping("/forecast/{city}")
+    public String forecast(@PathVariable String city, Model model) {
+        try {
+            List<ForecastDay> days = apiService.getForecast(city);
+            model.addAttribute("city", city);
+            model.addAttribute("days", days);
+        } catch (Exception e) { return "redirect:/"; }
+        return "forecast";
     }
 }

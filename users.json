@@ -1,0 +1,31 @@
+[ {
+  "username" : "sonya18",
+  "password" : "$2a$10$J8K5GEq.wT7Htqgzrpub1uvoaRH4bRiQqmesyW0HLNa0il/JqAEw.",
+  "popularCities" : [ "Минск", "Москва", "Токио", "Лондон", "Нью-Йорк" ],
+  "history" : [ {
+    "city" : "Сочи",
+    "temperature" : 15.05,
+    "condition" : "облачно с прояснениями",
+    "humidity" : 88,
+    "windSpeed" : 2.41,
+    "date" : "26.05.2026 02:17",
+    "icon" : "04n",
+    "favorite" : false,
+    "country" : "RU"
+  } ]
+}, {
+  "username" : "ksenia",
+  "password" : "$2a$10$eK2y9qiHbg2XO7rXG3DGHePWnXazVIevOCWsgQefYK08oFeeMk9j.",
+  "popularCities" : [ "Минск", "Москва", "Токио", "Лондон", "Нью-Йорк" ],
+  "history" : [ {
+    "city" : "Барановичи",
+    "temperature" : 12.63,
+    "condition" : "небольшая облачность",
+    "humidity" : 76,
+    "windSpeed" : 5.21,
+    "date" : "26.05.2026 02:22",
+    "icon" : "02n",
+    "favorite" : true,
+    "country" : "BY"
+  } ]
+} ]

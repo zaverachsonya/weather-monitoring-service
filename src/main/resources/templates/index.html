@@ -69,6 +69,18 @@
     Сервис для мониторинга погоды
   </h1>
   <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+    <span class="text-muted me-3">
+        <i class="bi bi-person-circle"></i>
+        Вы вошли как: <strong th:text="${#authentication.name}">Юзер</strong>
+    </span>
+      <form th:action="@{/logout}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-sm btn-outline-danger">
+          <i class="bi bi-box-arrow-right"></i> Выйти
+        </button>
+      </form>
+    </div>
+
     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#settingsModal">
       <i class="bi bi-gear-fill"></i> Настроить карточки
     </button>
@@ -121,7 +133,7 @@
         <button type="button" onclick="sortTable(2, false)" class="btn btn-sm btn-outline-primary">По стране</button>
         <button type="button" onclick="sortTable(4, true, false)" class="btn btn-sm btn-outline-primary">Темп. ↑</button>
         <button type="button" onclick="sortTable(4, true, true)" class="btn btn-sm btn-outline-primary">Темп. ↓</button>
-        <button type="button" onclick="sortTable(5, false)" class="btn btn-sm btn-outline-primary">По состоянию</button>
+        <button type="button" onclick="sortTable(5, false)" class="btn btn-sm btn-outline-primary">По условию</button>
       </div>
       <a href="/" class="btn btn-sm btn-secondary">Сброс</a>
     </div>
