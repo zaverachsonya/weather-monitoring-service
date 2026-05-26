@@ -1,4 +1,19 @@
 [ {
+  "username" : "ksenia",
+  "password" : "$2a$10$eK2y9qiHbg2XO7rXG3DGHePWnXazVIevOCWsgQefYK08oFeeMk9j.",
+  "popularCities" : [ "Минск", "Москва", "Токио", "Лондон", "Нью-Йорк" ],
+  "history" : [ {
+    "city" : "Барановичи",
+    "temperature" : 12.63,
+    "condition" : "небольшая облачность",
+    "humidity" : 76,
+    "windSpeed" : 5.21,
+    "date" : "26.05.2026 02:22",
+    "icon" : "02n",
+    "favorite" : true,
+    "country" : "BY"
+  } ]
+}, {
   "username" : "sonya18",
   "password" : "$2a$10$J8K5GEq.wT7Htqgzrpub1uvoaRH4bRiQqmesyW0HLNa0il/JqAEw.",
   "popularCities" : [ "Минск", "Москва", "Токио", "Лондон", "Нью-Йорк" ],
@@ -12,20 +27,55 @@
     "icon" : "04n",
     "favorite" : false,
     "country" : "RU"
-  } ]
-}, {
-  "username" : "ksenia",
-  "password" : "$2a$10$eK2y9qiHbg2XO7rXG3DGHePWnXazVIevOCWsgQefYK08oFeeMk9j.",
-  "popularCities" : [ "Минск", "Москва", "Токио", "Лондон", "Нью-Йорк" ],
-  "history" : [ {
+  }, {
     "city" : "Барановичи",
-    "temperature" : 12.63,
-    "condition" : "небольшая облачность",
-    "humidity" : 76,
-    "windSpeed" : 5.21,
-    "date" : "26.05.2026 02:22",
-    "icon" : "02n",
+    "temperature" : 19.16,
+    "condition" : "пасмурно",
+    "humidity" : 68,
+    "windSpeed" : 7.41,
+    "date" : "26.05.2026 16:31",
+    "icon" : "04d",
+    "favorite" : false,
+    "country" : "BY"
+  }, {
+    "city" : "Брест",
+    "temperature" : 23.98,
+    "condition" : "переменная облачность",
+    "humidity" : 38,
+    "windSpeed" : 11.0,
+    "date" : "26.05.2026 16:31",
+    "icon" : "03d",
     "favorite" : true,
+    "country" : "BY"
+  }, {
+    "city" : "Гродно",
+    "temperature" : 20.92,
+    "condition" : "облачно с прояснениями",
+    "humidity" : 49,
+    "windSpeed" : 10.0,
+    "date" : "26.05.2026 16:31",
+    "icon" : "04d",
+    "favorite" : true,
+    "country" : "BY"
+  }, {
+    "city" : "Варшава",
+    "temperature" : 26.31,
+    "condition" : "ясно",
+    "humidity" : 39,
+    "windSpeed" : 8.23,
+    "date" : "26.05.2026 16:31",
+    "icon" : "01d",
+    "favorite" : true,
+    "country" : "PL"
+  }, {
+    "city" : "Кобрин",
+    "temperature" : 23.6,
+    "condition" : "облачно с прояснениями",
+    "humidity" : 49,
+    "windSpeed" : 8.93,
+    "date" : "26.05.2026 16:56",
+    "icon" : "04d",
+    "favorite" : false,
     "country" : "BY"
   } ]
 } ]
